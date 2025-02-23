@@ -88,11 +88,11 @@ if __name__ == "__main__":
 
     X_train, y_train, _, _ = processor.split_data(processed_data)
 
-    print("Optimizing HP.")
+    logger.info("Optimizing HP.")
     best_trial = optimize_hp(processed_data)
-    print("Training best model on full data.")
+    logger.info("Training best model on full data.")
     X_train, y_train, _, _ = processor.split_data(processed_data)
-    best_model = build_model(trial=best_trial)  # Use full parameter set
+    best_model = build_model(trial=best_trial)
     best_model.fit(X_train, y_train)
     joblib.dump(best_model, output_model_path)
-    print(f"Best model saved to {output_model_path}")
+    logger.info(f"Best model saved to {output_model_path}")

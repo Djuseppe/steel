@@ -62,7 +62,7 @@ class Processor:
             raise ValueError("Invalid source. Supported sources are 'csv' and 'sql'.")
 
     @staticmethod
-    def _interpolate_zero_values(data: pd.DataFrame, col: str = "gas1", method: str = "linear") -> pd.DataFrame:
+    def _interpolate_zero_values(df: pd.DataFrame, col: str = "gas1", method: str = "linear") -> pd.DataFrame:
         """
         Interpolate zero values in the specified column of a DataFrame. This function
         replaces zero values in the specified column with NaN, then interpolates those
@@ -81,9 +81,9 @@ class Processor:
             specified column.
         :rtype: pd.DataFrame
         """
-        data = data.copy()
-        data.loc[data[col] == 0, col] = np.nan
-        data[col] = data[col].interpolate(method=method)
+        df = df.copy()
+        df.loc[df[col] == 0, col] = np.nan
+        df[col] = df[col].interpolate(method=method)
         return data
 
     @staticmethod
@@ -166,23 +166,20 @@ class Processor:
         y_test = data.loc[data["datetime"] >= settings.train_split, ["end_t"]]
         return X_train, y_train, X_test, y_test
 
-    def process(self, data: pd.DataFrame) -> pd.DataFrame:
-        data = data.copy()
-        data = self._interpolate_zero_values(data)
-        data = self._calculate_historical_features(data)
-        data = self._add_process_status(data)
-        data["end_t"] = data.groupby("heatid")["end_t"].bfill()
-        data["status"] = data.groupby("heatid")["status"].bfill()
-        data["datetime"] = data["datetime_corrected"]
-        data.drop(columns=["datetime_corrected"], inplace=True)
-        data.sort_values(by="datetime", inplace=True)
-        return data
+    def process(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = df.copy()
+        df = self._interpolate_zero_values(df)
+        df = self._calculate_historical_features(df)
+        df = self._add_process_status(df)
+        df["end_t"] = df.groupby("heatid")["end_t"].bfill()
+        df["status"] = df.groupby("heatid")["status"].bfill()
+        df["datetime"] = df["datetime_corrected"]
+        df.drop(columns=["datetime_corrected"], inplace=True)
+        df.sort_values(by="datetime", inplace=True)
+        return df
 
 
 if __name__ == "__main__":
-    pass
-    # fetch_and_validate_data(BASE_DIR / "data/input.csv")
-    df = Processor().read_data(source="sql")
-    # df = Preprocessor().read_data(file_path=BASE_DIR / "data/input.csv", source="csv")
-    df = Processor().process(df)
-    print(df)
+    data = Processor().read_data(source="sql")
+    data = Processor().process(data)
+    print(data)
