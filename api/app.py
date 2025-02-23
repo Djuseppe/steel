@@ -3,7 +3,7 @@ import logging
 import joblib
 import numpy as np
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from xgboost import XGBRegressor
 
 from api.config import settings
@@ -15,18 +15,16 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="XGBoost Prediction API", version="1.0")
 
-model: None | XGBRegressor = None
-
 
 @app.on_event("startup")
 def load_model():
     """Load the ML model at startup."""
-    global model
     if not settings.model_path.exists():
         logger.error("No fitted model found, please train the model first.")
         raise RuntimeError("No fitted model found, please train the model first.")
     model = joblib.load(settings.model_path)
     logger.info("Model successfully loaded.")
+    return model
 
 
 @app.get(path="/", response_model=dict, summary="Root endpoint.")
@@ -36,9 +34,8 @@ def root() -> dict:
 
 
 @app.post("/predict/", response_model=dict, summary="Perform inference using the fitted XGB model.")
-async def predict(input_data: PredictionInput) -> dict:
+async def predict(input_data: PredictionInput, model: XGBRegressor | None = Depends(load_model)) -> dict:
     """Perform inference using the trained model."""
-    global model
     if model is None:
         logger.error("Model was not loaded.")
         raise HTTPException(status_code=503, detail="Mode was not loaded.")
