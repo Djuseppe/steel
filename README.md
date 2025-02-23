@@ -28,3 +28,15 @@ docker compose up
 ```shell
 poetry run python -m main insert-data_to-db
 ```
+
+
+### Example of model inference request
+```shell
+curl -X POST "http://localhost:8000/predict/" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "gas1": 9.85,
+           "datetime": "2023-01-01T04:02:20",
+           "heatid": 16526
+         }'
+```
