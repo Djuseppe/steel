@@ -36,4 +36,16 @@ jupyterlab = "^4.3.5"
 seaborn = "^0.13.2"
 jupyter = "^1.1.1"
 matplotlib = "^3.10.0"
+black = "^25.1.0"
+isort = "^6.0.0"
 
+
+
+[tool.black]
+line-length = 120
+target-version = ["py313"]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+multi_line_output = 3
