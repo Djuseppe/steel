@@ -84,7 +84,7 @@ class Processor:
         df = df.copy()
         df.loc[df[col] == 0, col] = np.nan
         df[col] = df[col].interpolate(method=method)
-        return data
+        return df
 
     @staticmethod
     def _calculate_historical_features(
