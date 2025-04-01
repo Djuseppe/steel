@@ -1,4 +1,4 @@
-## Draslovka entry task solution
+## Steel factory solution
 
 Solution consists of [EDA ntb](./ntb/eda.ipynb) with modelling described.
 
